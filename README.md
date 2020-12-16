@@ -35,3 +35,34 @@
 | proSteps | int | 流程总步骤数 |
 | eventTypeIdArray | int数组 | 该流程包含的事件类型ID的数组 |
 | comments | string | 备注或解释 |
+
+### 2.2 获取流程实例列表
++ URL:
+    * `/api/procedure-list`
++ 参数：
+
+| 参数名 | 解释 | 例 |
+| --- | --- | --- |
+| proTypeId | 可选参数；用于找到所有属于proTypeId的流程实例 | 123 |
+| from | 可选参数；用于找到从这个时间开始创建的流程实例 | 2020-01-22T09:12:43Z |
+| to | 可选参数；用于找到到这个时间结束的流程实例 | 2020-01-22T09:12:43Z |
+| token | 机构的API账户标志 | 417fXkWTP85uE8LXZH9nqCZn3r3JjsTl |
+| datetime| 调用时间（UTC时间） | 2020-01-22T09:12:43Z |
+| signature | 机构的数字签名的Base64编码 | MIGIAkIB8HKnnrj5tMwEPVC... |
++ 签名字段：
+    * proTypeId
+    * from
+    * to
+    * token
+    * datetime
++ 返回字段：
+
+| 参数名 | 数据类型 | 说明 |
+| --- | --- | --- |
+| proId | long | 流程实例的ID |
+| proTypeId | int | 流程类型的ID |
+| proName | string | 流程实例的名称。命名规则：融资方代号_流程编号_日期 |
+| proStatus | byte | 流程当前状态-即实现的步骤数。例如：0=尚未启动 1=合同上传并完成数字签名 等。 |
+| eventIdArray | long数组 | 该流程包含的事件ID的数组 |
+| comments | string | 备注 |
+
