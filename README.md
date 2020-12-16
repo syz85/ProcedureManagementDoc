@@ -66,3 +66,73 @@
 | eventIdArray | long数组 | 该流程包含的事件ID的数组 |
 | comments | string | 备注 |
 
+## 3. 其它
+### 3.1 签名方式
+将所有**字段内容**，按照每个接口中“签名字段”的**顺序**进行字符串拼接，中间不需要任何分隔符。如果可选字段不设置，则用字符串“null”(不含双引号)填充之后使用SHA512-ECDSA算法进行签名。
+
+**注意**：为防止重放攻击，如果服务端收到两条或两条以上的相同接口、相同datetime的请求，仅会执行第一条，其余的请求会被丢弃。
+
+#### 3.1.1 密钥对生成方法
+使用openssl工具，在linux的控制台执行：
+```shell script
+# 私钥生成
+openssl ecparam -name secp521r1 -genkey -noout -out private.pem
+# 公钥生成
+openssl ec -in private.pem -pubout -out public.pem
+```
+#### 3.1.2 Java的依赖库（maven）
+```xml
+<dependency>
+    <groupId>org.bouncycastle</groupId>
+    <artifactId>bcprov-jdk15on</artifactId>
+    <version>1.67</version>
+</dependency>
+<dependency>
+    <groupId>org.bouncycastle</groupId>
+    <artifactId>bcpkix-jdk15on</artifactId>
+    <version>1.67</version>
+</dependency>
+```
+
+#### 3.1.3 加载私钥并签名
+```java
+String privateStr = "-----BEGIN EC PRIVATE KEY-----\n" +
+"MIHcAgEBBEIB7HKA4LlfQAE3P/p7deFeZttQzp5qGmUSx2YRxnpSqkqP9U3hD5I4\n" +
+"yuj6pfAr/KbfOHJ1Nd36e+vxEq5zR6tfvvagBwYFK4EEACOhgYkDgYYABABPDG3I\n" +
+"gL4u1KBudkH0whHjInK/aF0BhGGY0GuNlxtlMyksMaNIehJWA7GAyAC0qBKYAKrn\n" +
+"izGh+5Vbwo4vhpEp7AG5IDElnH2Dy9HvtYEDysWm5LhgRtPirTtIKrNT30vNBZXW\n" +
+"cnaC2ZIasyltnvTwXPZypAAPTYfD0nqvqq4aPuRJAQ==\n" +
+"-----END EC PRIVATE KEY-----";
+
+// 加载BouncyCastle
+Security.addProvider(new BouncyCastleProvider());
+
+// 读取私钥pem，这里也可以选择从文件读取
+PEMParser privatePemParser = new PEMParser(new StringReader(privateStr));
+PEMKeyPair pemKeyPair = (PEMKeyPair) privatePemParser.readObject();
+
+// 将私钥pem转为privateKey
+JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+KeyPair keyPair = converter.getKeyPair(pemKeyPair);
+ECPrivateKey privateKey = (ECPrivateKey)keyPair.getPrivate();
+
+// 签名
+Signature signature = Signature.getInstance("SHA512withECDSA");
+byte[] data = "这里是需要被签名的字符串".getBytes(StandardCharsets.UTF_8);
+signature.initSign(privateKey);
+signature.update(data);
+byte[] result = signature.sign();
+
+// 签名转为Base64
+String signatureBase64 = Base64.getEncoder().encode(result);
+```
+
+### 3.2 返回值的结构
+返回值都为`JSON`格式，如下：
+```json
+{"code": code, "msg": ...}
+```
+
+其中：
++ **code**：0表示成功，其它整数为错误
++ **msg**：按照每个接口“返回字段”中的数据结构返回
