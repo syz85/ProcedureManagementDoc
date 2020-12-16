@@ -129,10 +129,41 @@ String signatureBase64 = Base64.getEncoder().encode(result);
 
 ### 3.2 返回值的结构
 返回值都为`JSON`格式，如下：
-```json
+```
 {"code": code, "msg": ...}
 ```
 
 其中：
 + **code**：0表示成功，其它整数为错误
 + **msg**：按照每个接口“返回字段”中的数据结构返回
+
+### 3.3 测试账号
++ URL：
+```
+http://124.71.46.57:8080/
+```
++ 公钥：
+```
+-----BEGIN PUBLIC KEY-----
+MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQATwxtyIC+LtSgbnZB9MIR4yJyv2hd
+AYRhmNBrjZcbZTMpLDGjSHoSVgOxgMgAtKgSmACq54sxofuVW8KOL4aRKewBuSAx
+JZx9g8vR77WBA8rFpuS4YEbT4q07SCqzU99LzQWV1nJ2gtmSGrMpbZ708Fz2cqQA
+D02Hw9J6r6quGj7kSQE=
+-----END PUBLIC KEY-----
+```
+
++ 私钥：
+```
+-----BEGIN EC PRIVATE KEY-----
+MIHcAgEBBEIB7HKA4LlfQAE3P/p7deFeZttQzp5qGmUSx2YRxnpSqkqP9U3hD5I4
+yuj6pfAr/KbfOHJ1Nd36e+vxEq5zR6tfvvagBwYFK4EEACOhgYkDgYYABABPDG3I
+gL4u1KBudkH0whHjInK/aF0BhGGY0GuNlxtlMyksMaNIehJWA7GAyAC0qBKYAKrn
+izGh+5Vbwo4vhpEp7AG5IDElnH2Dy9HvtYEDysWm5LhgRtPirTtIKrNT30vNBZXW
+cnaC2ZIasyltnvTwXPZypAAPTYfD0nqvqq4aPuRJAQ==
+-----END EC PRIVATE KEY-----
+```
+
++ token:
+```
+417fXkWTP85uE8LXZH9nqCZn3r3JjsTl
+```
