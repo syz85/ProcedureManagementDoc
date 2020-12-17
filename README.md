@@ -150,6 +150,48 @@
 | crossChecked | byte | 是否完成交叉验证（大数据交叉验证为可选）0=没有交叉验证 1=1度交叉验证 2=2度交叉验证 ... |
 | comments | string | 备注 |
 
+### 2.6 获取存证实例列表
++ URL:
+    * `/api/proof-list`
++ 参数：
+
+| 参数名 | 解释 | 例 |
+| --- | --- | --- |
+| pvId | 可选参数；找到该pvId的数据 | 123 |
+| eventId | 可选参数；用于找到所有属于eventId的存证实例 | 123 |
+| token | 机构的API账户标志 | A57EF12783BC2 |
+| datetime | 调用时间（UTC时间） | 2020-01-22T09:12:43Z |
+| signature | 机构的数字签名的Base64编码 | RGlnaXRhbCBTaWduYXR1cmUgRXhhbXBsZQ== |
+
++ 签名字段：
+    * pvId（如果不填该参数，签名时将其值设为null）
+    * eventId（如果不填该参数，签名时将其值设为null）
+    * token
+    * datetime
+
++ 返回字段：
+
+| 参数名 | 数据类型 | 说明 |
+| --- | --- | --- |
+| pvId | long | 证据识别编号 |
+| eventId | int | 事件实例的ID |
+| pvType | string | 证据类型。例：哈希摘要，文档，数字协议等 |
+| contentHash | string | content二进制的哈希值（也就是java中byte[]的哈希值） |
+| deltaFitSign | string | 得分的签名 |
+| isOnBC | boolean | 是否上链 |
+| blockHash | string | 区块哈希摘要 |
+| operator | string | 操作人 |
+| operatorSign | string | 操作人签名 |
+| docId | string | 相关文档索引数据库识别号 |
+| docName | string | 文档的文件名 |
+| cParty1 | string | 证据甲方代码 |
+| cParty2 | string | 证据乙方代码 |
+| pvStatus | byte | 存证状态。0=无效 1=有效 2=2维交叉验证 3= 3维交叉验证 等 |
+| examId | long | 交叉验证记录识别号 |
+| comments | string | 备注 |
+| operateDatetime | string | 操作时间（UTC时间字符串） |
+
+
 ### 2.8 创建存证实例
 + URL:
     * `/api/create-proof`
