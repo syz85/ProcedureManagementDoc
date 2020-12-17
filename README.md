@@ -150,6 +150,46 @@
 | crossChecked | byte | 是否完成交叉验证（大数据交叉验证为可选）0=没有交叉验证 1=1度交叉验证 2=2度交叉验证 ... |
 | comments | string | 备注 |
 
+### 2.8 创建存证实例
++ URL:
+    * `/api/create-proof`
++ 参数：
+
+| 参数名 | 解释 | 例 |
+| --- | --- | --- |
+| eventId | 可选参数；用于找到该eventId的数据 | 123 |
+| pvType | 证据类型。可选值：哈希摘要，文档，数字协议 | 哈希摘要 |
+| content | 文档或哈希摘要的Base64（byte[]长度不应该超过200MB） | RGlnaXRhbCBTaWduYXR1cmUgRXhhbXBsZQ== |
+| contentHash | content二进制的哈希值（也就是java中byte[]的哈希值） | RGlnaXRhbCBTaWduYXR1cmUgRXhhbXBsZQ== |
+| cParty1 | 证据甲方代码 | |
+| cParty2 | 证据甲乙方代码 | |
+| operator | 操作员代码 | 张三 或 22603 |
+| operatorSign | 操作员的对contentHash的数字签名Base64 | RGlnaXRhbCBTaWduYXR1cmUgRXhhbXBsZQ== |
+| comments | 备注 | 合同正文 |
+| docId | 文档编号（pvType=文档）时需要传入 | 4616189191 |
+| originalDocName | 文档的原始（pvType=文档）时需要传入 | 合同.pdf |
+| token | 机构的API账户标志 | 417fXkWTP85uE8LXZH9nqCZn3r3JjsTl |
+| datetime| 调用时间（UTC时间） | 2020-01-22T09:12:43Z |
+| signature | 机构的数字签名的Base64编码 | MIGIAkIB8HKnnrj5tMwEPVC... |
+
++ 签名字段：
+    * eventId
+    * pvType
+    * contentHash
+    * cParty1
+    * cParty2
+    * operator
+    * operatorSign
+    * comments
+    * docId
+    * originalDocName
+    * token
+    * datetime
+    
++ 返回字段：
+    * 成功：pvId
+    * 失败：失败原因
+
 ### 2.9 创建事件实例
 + URL:
     * `/api/create-event`
