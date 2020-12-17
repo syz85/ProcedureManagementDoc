@@ -63,7 +63,56 @@
 | proTypeId | int | 流程类型的ID |
 | proName | string | 流程实例的名称。命名规则：融资方代号_流程编号_日期 |
 | proStatus | byte | 流程当前状态-即实现的步骤数。例如：0=尚未启动 1=合同上传并完成数字签名 等。 |
-| eventIdArray | long数组 | 该流程包含的事件ID的数组 |
+| comments | string | 备注 |
+
+### 2.3 创建一个流程实例
++ URL:
+    * `/api/create-procedure`
++ 参数：
+
+| 参数名 | 解释 | 例 |
+| --- | --- | --- |
+| proTypeId | 流程类型的ID | 123 |
+| proName | 流程实例的名称。命名规则：融资方代号_流程编号_日期 | 00001_001_20201203 |
+| comments | 备注 | 某公司票据抵押融资 |
+| token | 机构的API账户标志 | 417fXkWTP85uE8LXZH9nqCZn3r3JjsTl |
+| datetime| 调用时间（UTC时间） | 2020-01-22T09:12:43Z |
+| signature | 机构的数字签名的Base64编码 | MIGIAkIB8HKnnrj5tMwEPVC... |
+
++ 签名字段：
+    * proTypeId
+    * proName
+    * comments
+    * token
+    * datetime
++ 返回字段：
+    * 成功：proId
+    * 失败：失败原因
+
+### 2.4 获取事件类型列表
++ URL:
+    * `/api/event-type-list`
++ 参数：
+
+| 参数名 | 解释 | 例 |
+| --- | --- | --- |
+| proTypeId | 可选参数；用于找到所有属于proTypeId的事件类型 | 123 |
+| token | 机构的API账户标志 | 417fXkWTP85uE8LXZH9nqCZn3r3JjsTl |
+| datetime| 调用时间（UTC时间） | 2020-01-22T09:12:43Z |
+| signature | 机构的数字签名的Base64编码 | MIGIAkIB8HKnnrj5tMwEPVC... |
+
++ 签名字段：
+    * proTypeId（如果不填该参数，签名时将其值设为null）
+    * token
+    * datetime
++ 返回字段：
+
+| 参数名 | 数据类型 | 说明 |
+| --- | --- | --- |
+| eventTypeId | int | 事件类型的ID |
+| proTypeId | int | 事件类型所属的流程类型ID |
+| eventTypeName | string | 事件类型的名称 |
+| preEventTypeId | int | 当前事件类型的前置事件类型，只有前置事件类型的事件实例完成后，才能进行该事件。第一个事件的前置ID为null |
 | comments | string | 备注 |
 
 ## 3. 其它
