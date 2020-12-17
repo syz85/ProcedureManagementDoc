@@ -115,6 +115,69 @@
 | preEventTypeId | int | 当前事件类型的前置事件类型，只有前置事件类型的事件实例完成后，才能进行该事件。第一个事件的前置ID为null |
 | comments | string | 备注 |
 
+### 2.5 获取事件实例列表
++ URL:
+    * `/api/event-list`
++ 参数：
+
+| 参数名 | 解释 | 例 |
+| --- | --- | --- |
+| eventId | 可选参数；用于找到该eventId的数据 | 123 |
+| proId | 可选参数；用于找到所有属于proId的所有事件实例 | 123 |
+| eventTypeId | 可选参数；用于找到所有属于eventTypeId的事件实例 | 123 |
+| token | 机构的API账户标志 | 417fXkWTP85uE8LXZH9nqCZn3r3JjsTl |
+| datetime| 调用时间（UTC时间） | 2020-01-22T09:12:43Z |
+| signature | 机构的数字签名的Base64编码 | MIGIAkIB8HKnnrj5tMwEPVC... |
+
++ 签名字段：
+    * eventId（如果不填该参数，签名时将其值设为null）
+    * proId（如果不填该参数，签名时将其值设为null）
+    * eventTypeId（如果不填该参数，签名时将其值设为null）
+    * token
+    * datetime
++ 返回字段：
+
+| 参数名 | 数据类型 | 说明 |
+| --- | --- | --- |
+| proId | long | 事件实例所属的流程实例ID |
+| eventId | long | 事件实例的编号 |
+| eventTypeId | int | 事件类型的ID |
+| eventName | string | 事件实例的名称。命名规则：融资方代号_事件的融资方内部编号_日期 |
+| eventStatus | byte | 事件状态。0=尚未完成，1=通过初审，2=通过二审，3=一级交叉验证完成… 等 |
+| eventDatetime | string | 事件时间（当前完成的最晚时间，UTC时间） |
+| isComplete | boolean | 是否完成 0=未完成 1= 完成 |
+| isDiscard | boolean | 是否已经被丢弃（如果有存证文档的修改，需要新建一个事件实例，旧版的实例会被标记为discard） |
+| crossChecked | byte | 是否完成交叉验证（大数据交叉验证为可选）0=没有交叉验证 1=1度交叉验证 2=2度交叉验证 ... |
+| comments | string | 备注 |
+
+### 2.9 创建事件实例
++ URL:
+    * `/api/create-event`
++ 参数：
+
+| 参数名 | 解释 | 例 |
+| --- | --- | --- |
+| proId | 流程实例的ID | 123 |
+| eventTypeId | 事件类型的ID | 123 |
+| eventName | 事件实例的名称。命名规则：融资方代号_事件的融资方内部编号_日期 | 110033_009816_20201123 |
+| discardEventId | 可选参数；如果此proId 的eventTypeId已经创建过一个事件实例，说明本次调用是对原来的事件实例有修改，需要传入此参数，用于将旧版的事件实例丢弃 | 123 |
+| comments | 备注 | 合同 |
+| token | 机构的API账户标志 | 417fXkWTP85uE8LXZH9nqCZn3r3JjsTl |
+| datetime| 调用时间（UTC时间） | 2020-01-22T09:12:43Z |
+| signature | 机构的数字签名的Base64编码 | MIGIAkIB8HKnnrj5tMwEPVC... |
+
++ 签名字段：
+    * proId
+    * eventTypeId
+    * eventName
+    * discardEventId
+    * comments
+    * token
+    * datetime
++ 返回字段：
+   * 成功：proId
+   * 失败：失败原因 
+
 ## 3. 其它
 ### 3.1 签名方式
 将所有**字段内容**，按照每个接口中“签名字段”的**顺序**进行字符串拼接，中间不需要任何分隔符。如果可选字段不设置，则用字符串“null”(不含双引号)填充之后使用SHA512-ECDSA算法进行签名。
@@ -145,35 +208,39 @@ openssl ec -in private.pem -pubout -out public.pem
 
 #### 3.1.3 加载私钥并签名
 ```java
-String privateStr = "-----BEGIN EC PRIVATE KEY-----\n" +
-"MIHcAgEBBEIB7HKA4LlfQAE3P/p7deFeZttQzp5qGmUSx2YRxnpSqkqP9U3hD5I4\n" +
-"yuj6pfAr/KbfOHJ1Nd36e+vxEq5zR6tfvvagBwYFK4EEACOhgYkDgYYABABPDG3I\n" +
-"gL4u1KBudkH0whHjInK/aF0BhGGY0GuNlxtlMyksMaNIehJWA7GAyAC0qBKYAKrn\n" +
-"izGh+5Vbwo4vhpEp7AG5IDElnH2Dy9HvtYEDysWm5LhgRtPirTtIKrNT30vNBZXW\n" +
-"cnaC2ZIasyltnvTwXPZypAAPTYfD0nqvqq4aPuRJAQ==\n" +
-"-----END EC PRIVATE KEY-----";
-
-// 加载BouncyCastle
-Security.addProvider(new BouncyCastleProvider());
-
-// 读取私钥pem，这里也可以选择从文件读取
-PEMParser privatePemParser = new PEMParser(new StringReader(privateStr));
-PEMKeyPair pemKeyPair = (PEMKeyPair) privatePemParser.readObject();
-
-// 将私钥pem转为privateKey
-JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
-KeyPair keyPair = converter.getKeyPair(pemKeyPair);
-ECPrivateKey privateKey = (ECPrivateKey)keyPair.getPrivate();
-
-// 签名
-Signature signature = Signature.getInstance("SHA512withECDSA");
-byte[] data = "这里是需要被签名的字符串".getBytes(StandardCharsets.UTF_8);
-signature.initSign(privateKey);
-signature.update(data);
-byte[] result = signature.sign();
-
-// 签名转为Base64
-String signatureBase64 = Base64.getEncoder().encode(result);
+class Demo {
+    public static void main(String[] args) {
+        String privateStr = "-----BEGIN EC PRIVATE KEY-----\n" +
+        "MIHcAgEBBEIB7HKA4LlfQAE3P/p7deFeZttQzp5qGmUSx2YRxnpSqkqP9U3hD5I4\n" +
+        "yuj6pfAr/KbfOHJ1Nd36e+vxEq5zR6tfvvagBwYFK4EEACOhgYkDgYYABABPDG3I\n" +
+        "gL4u1KBudkH0whHjInK/aF0BhGGY0GuNlxtlMyksMaNIehJWA7GAyAC0qBKYAKrn\n" +
+        "izGh+5Vbwo4vhpEp7AG5IDElnH2Dy9HvtYEDysWm5LhgRtPirTtIKrNT30vNBZXW\n" +
+        "cnaC2ZIasyltnvTwXPZypAAPTYfD0nqvqq4aPuRJAQ==\n" +
+        "-----END EC PRIVATE KEY-----";
+        
+        // 加载BouncyCastle
+        Security.addProvider(new BouncyCastleProvider());
+        
+        // 读取私钥pem，这里也可以选择从文件读取
+        PEMParser privatePemParser = new PEMParser(new StringReader(privateStr));
+        PEMKeyPair pemKeyPair = (PEMKeyPair) privatePemParser.readObject();
+        
+        // 将私钥pem转为privateKey
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+        KeyPair keyPair = converter.getKeyPair(pemKeyPair);
+        ECPrivateKey privateKey = (ECPrivateKey)keyPair.getPrivate();
+        
+        // 签名
+        Signature signature = Signature.getInstance("SHA512withECDSA");
+        byte[] data = "这里是需要被签名的字符串".getBytes(StandardCharsets.UTF_8);
+        signature.initSign(privateKey);
+        signature.update(data);
+        byte[] result = signature.sign();
+        
+        // 签名转为Base64
+        String signatureBase64 = Base64.getEncoder().encode(result);
+    }
+}
 ```
 
 ### 3.2 返回值的结构
