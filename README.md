@@ -258,7 +258,27 @@
     * datetime
 + 返回字段：
    * 成功：proId
-   * 失败：失败原因 
+   * 失败：失败原因
+   
+### 2.10 计算哈希摘要
++ URL:
+    * `/api/hash`
++ 参数：
+
+| 参数名 | 解释 | 例 |
+| --- | --- | --- |
+| content | 需要签名的内容的Base64编码 | 5ZCI5ZCM5q2j5paH | 
+| token | 机构的API账户标志 | 417fXkWTP85uE8LXZH9nqCZn3r3JjsTl |
+| datetime| 调用时间（UTC时间） | 2020-01-22T09:12:43Z |
+| signature | 机构的数字签名的Base64编码 | MIGIAkIB8HKnnrj5tMwEPVC... |
+
++ 签名字段：
+    * content（直接对Base64字符串做签名）
+    * token
+    * datetime
++ 返回字段：
+   * 成功：hash
+   * 失败：失败原因
 
 ## 3. 其它
 ### 3.1 签名方式
