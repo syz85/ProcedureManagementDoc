@@ -242,7 +242,7 @@
 | cParty1 | 非必填，证据甲方代码 | |
 | cParty2 | 非必填，证据乙方代码 | |
 | cParty3 | 非必填，证据丙方代码 | |
-| cParty4 | 非必填，证据丁乙方代码 | |
+| cParty4 | 非必填，证据丁方代码 | |
 | operator | 操作员代码 | 张三 或 22603 |
 | operatorSign | 非必填，操作员的对contentHash的数字签名Base64 | RGlnaXRhbCBTaWduYXR1cmUgRXhhbXBsZQ== |
 | comments | 备注 | 合同正文 |
