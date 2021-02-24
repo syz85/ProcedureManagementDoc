@@ -176,7 +176,7 @@
 
 + 返回样例：
 ```json
-{"msg":[{"comments":"用于测试","crossChecked":0,"eventDatetime":"2020-12-17T07:26:54Z","eventId":601897866100782,"eventName":"测试event","eventStatus":0,"eventTypeId":1,"isComplete":false,"isDiscard":true,"proId":587981966540846},{"comments":"用于测试","crossChecked":0,"eventDatetime":"2020-12-17T07:26:54Z","eventId":601897948938286,"eventName":"测试event","eventStatus":0,"eventTypeId":1,"isComplete":false,"isDiscard":false,"proId":587981966540846},{"comments":"用于测试","crossChecked":0,"eventDatetime":"2021-01-15T05:29:07Z","eventId":3221799931215918,"eventName":"测试event","eventStatus":0,"eventTypeId":1,"isComplete":false,"isDiscard":true,"proId":3212782118895662},{"comments":"用于测试","crossChecked":0,"eventDatetime":"2021-01-15T05:29:07Z","eventId":3221800013004846,"eventName":"测试event","eventStatus":0,"eventTypeId":1,"isComplete":false,"isDiscard":false,"proId":3212782118895662}],"code":1}
+{"msg":[{"comments":"用于测试","crossChecked":0,"eventDatetime":"2020-12-17T07:26:54Z","eventId":601897866100782,"eventName":"测试event","eventStatus":0,"eventTypeId":1,"isComplete":false,"isDiscard":true,"proId":587981966540846},{"comments":"用于测试","crossChecked":0,"eventDatetime":"2020-12-17T07:26:54Z","eventId":601897948938286,"eventName":"测试event","eventStatus":0,"eventTypeId":1,"isComplete":false,"isDiscard":false,"proId":587981966540846},{"comments":"用于测试","crossChecked":0,"eventDatetime":"2021-01-15T05:29:07Z","eventId":3221799931215918,"eventName":"测试event","eventStatus":0,"eventTypeId":1,"isComplete":false,"isDiscard":true,"proId":3212782118895662},{"comments":"用于测试","crossChecked":0,"eventDatetime":"2021-01-15T05:29:07Z","eventId":3221800013004846,"eventName":"测试event","eventStatus":0,"eventTypeId":1,"isComplete":false,"isDiscard":false,"proId":3212782118895662}],"code":0}
 ```
 
 ### 2.6 获取存证实例列表
@@ -309,29 +309,9 @@
 {"msg":3225421538656302,"code":0}
 ```
 
-### 2.10 计算哈希摘要
-+ URL:
-    * `/api/hash`
-+ 参数：
-
-| 参数名 | 解释 | 例 |
-| --- | --- | --- |
-| content | 需要签名的内容的Base64编码 | 5ZCI5ZCM5q2j5paH | 
-| token | 机构的API账户标志 | 417fXkWTP85uE8LXZH9nqCZn3r3JjsTl |
-| datetime| 调用时间（UTC时间） | 2020-01-22T09:12:43Z |
-| signature | 机构的数字签名的Base64编码 | MIGIAkIB8HKnnrj5tMwEPVC... |
-
-+ 签名字段：
-    * content（直接对Base64字符串做签名）
-    * token
-    * datetime
-+ 返回字段：
-   * 成功：hash
-   * 失败：失败原因
-
 ## 3. 其它
 ### 3.1 签名方式
-将所有**字段内容**，按照每个接口中“签名字段”的**顺序**进行字符串拼接，中间不需要任何分隔符。如果可选字段不设置，则用字符串“null”(不含双引号)填充之后使用SHA512-ECDSA算法进行签名。
+将所有**字段内容**，按照每个接口中“签名字段”的key排序（升序）进行字符串拼接，中间不需要任何分隔符。如果可选字段不设置，则用字符串""(不含双引号)填充（即长度为0的字符串）使用SHA512-ECDSA算法进行签名。
 
 **注意**：为防止重放攻击，如果服务端收到两条或两条以上的相同接口、相同datetime的请求，仅会执行第一条，其余的请求会被丢弃。
 
